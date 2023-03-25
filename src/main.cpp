@@ -1,59 +1,60 @@
 #include <Arduino.h>
-#include "libwifi.h"
 #include <WiFi.h>
-
-const char *ssid = "LAPTOP-HL7K9H6R 2729";
-const char *password = "3|4254Ey";
-const int puerto = 80;
-WiFiServer servidor(puerto); // Construimos un objeto de tipo servidor TCP
+//crear constante para un red inalambrica
+const char * nombre = "LAPTOP-HL7K9H6R 2729";
+const char * password = "3|4254Ey";
+const char * host ="www.google.com";
+const int puerto =80;
 
 void setup() {
+  // code
+  // put your setup code here, to run once:
+  pinMode(2,OUTPUT); // coloco el pin 2 como salida
+  Serial.begin(115200);//confuguracion de velocidad de wifi
+  Serial.println("Inicializado el dispocitovo");
+  WiFi.begin(nombre,password);
 
-  pinMode(2, OUTPUT); // Coloco el pin 2 como salida
-  Serial.begin(115200);
-  Serial.println("Inicializando dispositivo");
-  conectarWifi(ssid, password);
-  servidor.begin(); // Inicializamos el servidor TCP
+  Serial.printf("Estableciendo vinculo con el Ap.");
+  while (WiFi.status() !=WL_CONNECTED){
+  Serial.print(".");
+  delay(1000);
+    
+  }
+  Serial.println("\r\n Conecion establecida");
+  Serial.println("numero IP asignado");
+  Serial.println(WiFi.localIP());//imprime el numero ip
+  Serial.println();
 }
 
 void loop() {
-  WiFiClient cliente = servidor.available(); // Devolvemos un cliente TCP por wifi conectado a servidor
-
-  if (cliente) { // PASO 1: Si existe un cliente conectado?
-    Serial.println("Se conecto un cliente");
-    while (cliente.connected()) { // PASO 2: Mientras el cliente este conectado, reciba peticiones (requests)
-      String mensaje;
-      if (cliente.available()) { // PASO 3: Verifico si el cliente nos ha enviado un caracter
-        char letra = cliente.read(); // PASO 4: Leemos el caracter
-        Serial.print(letra);
-        if (letra == '\n')
-        { // Si el caracter es un enter (\n\r: 0x10 y 0x13)
-          // PASO 6: Devolvemos una respuesta (response) HTTP
-          if (mensaje.length() == 0) {
-            cliente.println("HTTP/1.1 200 OK");
-            cliente.println("Content-type:text/html");
-            cliente.println(); // Enviamos una linea vacia indica al protocolo HTTP que la cabecera finalizo
-            cliente.println("Haga clic <a href=\"/H\">aqui</a> para encender el LED");
-            cliente.println("Haga clic  <a href=\"/L\">aqui</a> para apagar el LED");
-            cliente.println(); // Finalizamos el envio del cuerpo (body) de la pagina
-            break;
-          }
-          else {
-            mensaje = "";
-          }
-        }
-        else if (letra != '\r') {
-          mensaje += letra; // PASO 5: Concatenamos cada caracter que esta llegando en mensaje
-        }
-        if (mensaje.endsWith("GET /H")) {
-          digitalWrite(2, HIGH);
-        }
-        else if (mensaje.endsWith("GET /L")) {
-          digitalWrite(2, LOW);
-        }
-      }
-    }
-    Serial.println("cerrando conexion");
-    cliente.stop();
+  WiFiClient Cliente;
+  //
+  if(!(Cliente.connect(host,puerto))){
+    Serial.println("Erro conexion la host fallida");
+    delay(3000);
+    return;
   }
+  Serial.print("conexion al host exitosa");
+  
+  // peticion GET al servidor http
+  Cliente.print("GET /index.html HTTP/1.1\r\nHost: "+String(host)+"\r\n"+"Connection: close\r\n\r\n");
+
+  //Debemos darle un tiempo al servidor a que responda la peticion
+  //delay(5000); // no funciona aqui bloequea el wifi bloqueante
+  unsigned long milisegundos=millis(); //hora de inicio
+
+while(Cliente.available()==0){// preguntamos si no hay datos recibidos disponibles
+    if(millis()-milisegundos>7000){
+      Serial.println("se expiro el tiempo de la conexion");
+      Cliente.stop();
+    }
+}
+
+while (Cliente.available()){
+  String linea = Cliente.readStringUntil('\r');
+  Serial.println(linea);
+}
+  Serial.println("Fin de la conexion");
+  Cliente.stop();
+  delay(2000);
 }
