@@ -2,6 +2,8 @@
 #include "libwifi.h"
 #include <WiFi.h>
 
+
+
 void conectarWifi(const char * ssid, const char * password){
   WiFi.begin(ssid, password);
   Serial.println("Estableciendo vinculo con el AP.");
