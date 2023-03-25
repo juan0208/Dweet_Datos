@@ -1,3 +1,4 @@
+
 #include <Arduino.h>
 #include <WiFi.h>
 #include "DHT.h"
@@ -8,8 +9,8 @@
 #define DHTTYPE DHT11  //Especificamos el tipo de sensor DHT11 DHT22 DHT21
 
 DHT dht(DHTPIN, DHTTYPE);  //Creamos el objeto que representa al sensor
-const char* ssid = "LAPTOP-HL7K9H6R 2729";
-const char* password =  "3|4254Ey";
+const char* ssid = "FLIA LONDONO LOPEZ";
+const char* password =  "moreno1563";
 const char* host = "dweet.io";
 
 
@@ -121,7 +122,7 @@ void loop() {
    Serial.print(indice);
 
   //String cadena = "hola"+String("mundo")+String(variable);
-  String url = "/dweet/for/ucevaJaime?temperatura="+String(temperatura)+"&humedad="+String(humedad)+"&indice="+String(indice);
+  String url = "/dweet/for/ucevaJuan?temperatura="+String(temperatura)+"&humedad="+String(humedad)+"&indice="+String(indice);
 
   //Se pueden leer los dweets en  https://dweet.io/get/latest/dweet/for/uceva10
 
