@@ -1,32 +1,19 @@
 #include <Arduino.h>
+#include <WiFi.h>
 
-int numero = 10;
-
-void duplicar(int *punteroNumero) {
-  *punteroNumero = *punteroNumero * 2 ;
-  Serial.print("En duplicar(): punteroNumero = ");
-  Serial.println(*punteroNumero);
-}
+const char *ssid = "LAPTOP-HL7K9H6R 2729";
+const char *password = "3|4254Ey";
+const int puerto = 80;
 
 void setup() {
-  Serial.begin(115200);
-  pinMode(2, OUTPUT);
+  pinMode(2, OUTPUT); // Coloco el pin 2 como salida
 }
 
 void loop() {
-  Serial.print("En loop(): numero = ");
-  Serial.println(numero);
-  duplicar( &numero );
-  char institucion[] = { 'J','A','I','M','E','\n'} ;
-  for (int i=0 ; i < 6 ; i++) {
-    Serial.print( institucion[i] );
-  }
-  for (int i=0 ; i < 6 ; i++) {
-    Serial.print( *(institucion + i) );
-  }
-  for (int i=0 ; i < 6 ; i++) {
-    Serial.print( *( institucion + i * sizeof(char)) );
-  }
-  Serial.flush();
-  exit(0);
+  Serial.println("Led encendido");
+  digitalWrite(2, HIGH);
+  delay(1000);
+  digitalWrite(2, LOW);
+  Serial.println("Led apagado");
+  delay(1000);
 }
